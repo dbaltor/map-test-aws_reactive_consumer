@@ -1,7 +1,10 @@
+<<<<<<< HEAD
 # build artifacts
 .gradle
 build
 
+=======
+>>>>>>> 8b3c6ec9c239abcaff9db3a99861f92ff685d923
 # Compiled class file
 *.class
 

@@ -1,0 +1,36 @@
+{
+  "Version": "2012-10-17",
+  "Id": "arn:aws:sqs:eu-west-2:556385395922:heatmap-queue/SQSDefaultPolicy",
+  "Statement": [
+    {
+      "Sid": "Sid1540941833210",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "*"
+      },
+      "Action": "SQS:SendMessage",
+      "Resource": "arn:aws:sqs:eu-west-2:556385395922:heatmap-queue",
+      "Condition": {
+        "ArnEquals": {
+          "aws:SourceArn": "arn:aws:sns:eu-west-2:556385395922:heatmap"
+        }
+      }
+    }
+  ]
+}
+=============================
+{
+  "Version": "2008-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "SQS:SendMessage",
+      "Condition": {
+        "ArnEquals": {
+          "aws:SourceArn": ", arn:aws:sns:eu-west-2:556385395922:heatmap"
+        }
+      }
+    }
+  ]
+}

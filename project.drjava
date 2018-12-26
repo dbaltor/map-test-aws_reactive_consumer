@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<drjava version="drjava-20160913-225446">
+  <project autorefresh="false" build="build/classes/" root="" work="">
+    <createjar file=""/>
+    <source>
+      <file active="true" name="src/main/java/map/Application.java" package="map" timestamp="25-Dec-2018 16:18:22">
+        <select from="7205" to="7205"/>
+        <scroll column="2755" row="6"/>
+      </file>
+      <file name="src/main/java/qm/QueueManager.java" package="qm" timestamp="22-Dec-2018 19:49:02">
+        <select from="7205" to="7205"/>
+        <scroll column="2755" row="6"/>
+      </file>
+      <file name="src/main/java/map/Lab2.java" package="map" timestamp="12-Nov-2018 20:40:13">
+        <select from="7205" to="7205"/>
+        <scroll column="2755" row="6"/>
+      </file>
+      <file name="src/main/java/map/WsPacket.java" package="map" timestamp="15-Sep-2018 18:24:25">
+        <select from="7205" to="7205"/>
+        <scroll column="2755" row="6"/>
+      </file>
+      <file name="src/main/java/map/Lab1.java" package="map" timestamp="26-Nov-2018 01:04:36">
+        <select from="7205" to="7205"/>
+        <scroll column="2755" row="6"/>
+      </file>
+    </source>
+    <included/>
+    <excluded/>
+    <collapsed/>
+    <classpath/>
+    <breakpoints/>
+    <watches/>
+    <bookmarks/>
+    <preferences/>
+  </project>
+</drjava>

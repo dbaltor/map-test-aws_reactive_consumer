@@ -110,7 +110,6 @@ public class Application {
       }
       // Build the SNS client
       SnsClient snsClient = SnsClient.builder()
-        .region(Region.EU_WEST_2)
         .build();     
       // Subscribe the Supplier's topic
       try{      
@@ -189,7 +188,6 @@ public class Application {
       
       // Build the SNS client
       SnsClient snsClient = SnsClient.builder()
-        .region(Region.EU_WEST_2)
         .build();     
       // Unsubscribe the Supplier's topic
       try{      

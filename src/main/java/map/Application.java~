@@ -20,6 +20,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.BinaryWebSocketHandler;
+import org.springframework.web.socket.CloseStatus;
 
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sns.SnsClient;
@@ -31,13 +32,15 @@ import qm.QueueManager;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.ConnectableFlux;
+import reactor.core.scheduler.Schedulers;
+import reactor.core.Disposable;
 
 import static java.util.stream.Collectors.*;
 import java.util.function.BiConsumer;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.io.IOException;
 
 @EnableWebSocket
 @SpringBootApplication
@@ -54,9 +57,12 @@ public class Application {
 
     // Lambda used as callback when reading messages asynchronously. Static definition allows for self-reference.
     private static BiConsumer<List<Message>, Throwable> consumeHeatmap;
+    
+    // Flow of heatmap coordinates from the supplier
+    private static ConnectableFlux<String> heatMapEvents;
 
-    // Map of supplier's messages queue per client
-    private static final Map<String, BlockingQueue<String>> clients = new ConcurrentHashMap<>();
+    // Collections of clients' subscriptions
+    private static final Map<String, Disposable> clients = new ConcurrentHashMap<>();
     
     public static void main(String[] args)
     {
@@ -88,7 +94,6 @@ public class Application {
         };
     }
     
-//    private static final String HEATMAP_QUEUE_URL = "https://sqs.eu-west-2.amazonaws.com/556385395922/heatmap-queue";
     // Subscribe the supplier topic
     private static void subscribeSupplier()
     {
@@ -105,7 +110,6 @@ public class Application {
       }
       // Build the SNS client
       SnsClient snsClient = SnsClient.builder()
-        .region(Region.EU_WEST_2)
         .build();     
       // Subscribe the Supplier's topic
       try{      
@@ -165,42 +169,14 @@ public class Application {
         QueueManager.getAsync(subscriptionQueueURL)
           .whenComplete(consumeHeatmap);
       });
-      final ConnectableFlux<String> co = bridge
+      // Set up the Flow and start emitting heatmap events
+      heatMapEvents = bridge
         //***************** DEBUG      
-        .log()
+        //.log()
         //*****************
+        .publishOn(Schedulers.parallel())
         .publish();
-      co.connect();
-/*
-      // start a thread to handle lab 1 messages received
-      new Thread(() -> {
-        List<Message> msgs;
-        
-        while(true){
-          // Poll the queue waiting for coordinates
-          msgs = QueueManager.get(subscriptionQueueURL); 
-          if (msgs.isEmpty()) {
-            continue;
-          }
-          // Get messages received and concatenate them
-          String lines = msgs.stream()
-            .map(Message::body)
-            //***************** DEBUG      
-            //.peek(System.out::println)
-            //*****************
-            .collect(joining("\n"));
-          
-          // Put the message into the clients' queues
-          for (Map.Entry<String, BlockingQueue<String>> client : clients.entrySet()){
-            //***************** DEBUG
-            //System.out.println("MESSAGE BEING DELIVERED to client: " + client.getKey());
-            //*****************
-            if (!client.getValue().offer(lines)){
-              System.out.println(client.getKey() + " client's queue is full. Received message discarded!");
-            }
-          }
-        }
-      }).start();*/     
+      heatMapEvents.connect();
     }
       
     // Register a shutdown hook with the JVM
@@ -212,7 +188,6 @@ public class Application {
       
       // Build the SNS client
       SnsClient snsClient = SnsClient.builder()
-        .region(Region.EU_WEST_2)
         .build();     
       // Unsubscribe the Supplier's topic
       try{      
@@ -260,10 +235,40 @@ public class Application {
           try {
             // Send start command to supplier
             QueueManager.put(HEATMAP_SUPPLIER_URL, "start");
-            
-            new Lab1(session, clients);
+            //***************** DEBUG
+            System.out.println("NEW CLIENT CONNECTED!!! " + session.getId());
+            //*****************
+            // subscribing for Heat Map events
+            Disposable subscription = heatMapEvents.subscribe(event -> {
+              //***************** DEBUG
+              //System.out.println("Sending: " + event);
+              //*****************              
+              if (!WsPacket.send(session, "m1," + event)){
+                // Client socket is closed. 
+                System.out.println("Lab 1 finished. Socket " + session.getId() + " closed!");
+                // Unsubscribe the Flux to stopping receiving events
+                clients.get(session.getId()).dispose();
+                // remove client from the clients list
+                clients.remove(session.getId());
+              }              
+            }, error -> {
+              // Error received from the Flux! 
+              System.out.println("Lab 1 finished. Error received from the Flux! Will close socket " + session.getId());  
+              try {
+                // Disconnect client!
+                session.close(CloseStatus.SERVER_ERROR);
+              }
+              catch(IOException e) {
+                System.out.println("Exception caught while trying to close the socket " + session.getId());
+                e.printStackTrace();
+              }
+              // remove client from the clients list
+              clients.remove(session.getId());
+            });
+            // Register this client's subscription
+            clients.put(session.getId(), subscription);
           }
-          catch( Exception e) {
+          catch(Exception e) {
             System.out.println("Exception caught while trying to write into the queue: " + HEATMAP_SUPPLIER_URL);
             e.printStackTrace();
           }          

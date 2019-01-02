@@ -239,18 +239,26 @@ public class Application {
             System.out.println("NEW CLIENT CONNECTED!!! " + session.getId());
             //*****************
             // subscribing for Heat Map events
-            Disposable subscription = heatMapEvents.subscribe(event -> {
+            Disposable subscription = heatMapEvents
               //***************** DEBUG
-              //System.out.println("Sending: " + event);
-              //*****************              
-              if (!WsPacket.send(session, "m1," + event)){
-                // Client socket is closed. 
-                System.out.println("Lab 1 finished. Socket " + session.getId() + " closed!");
-                // Unsubscribe the Flux to stopping receiving events
-                clients.get(session.getId()).dispose();
-                // remove client from the clients list
-                clients.remove(session.getId());
-              }              
+              //.log()
+              //*****************
+              .subscribe(event -> {
+                //***************** DEBUG
+                //System.out.println("Sending: " + event);
+                //*****************              
+                if (!WsPacket.send(session, "m1," + event)){
+                  // Client socket is closed. 
+                  System.out.println("Lab 1 finished. Socket " + session.getId() + " closed!");
+                  // Unsubscribe the Flux to stopping receiving events
+                  clients.get(session.getId()).dispose();
+                  // remove client from the list of clients
+                  clients.remove(session.getId());
+                  //***************** DEBUG
+                  System.out.println("SUBSCRIPTION REMOVED FROM THE LIST OF CLIENTS...");
+                  System.out.println("Lab1: Total number of clients: " + clients.size());
+                  //*****************                  
+                }              
             }, error -> {
               // Error received from the Flux! 
               System.out.println("Lab 1 finished. Error received from the Flux! Will close socket " + session.getId());  
@@ -262,11 +270,19 @@ public class Application {
                 System.out.println("Exception caught while trying to close the socket " + session.getId());
                 e.printStackTrace();
               }
-              // remove client from the clients list
+              // remove client from the list of clients
               clients.remove(session.getId());
+              //***************** DEBUG
+              System.out.println("SUBSCRIPTION REMOVED FROM THE LIST OF CLIENTS...");
+              System.out.println("Lab1: Total number of clients: " + clients.size());
+              //*****************                
             });
             // Register this client's subscription
             clients.put(session.getId(), subscription);
+            //***************** DEBUG
+            System.out.println("SUBSCRIPTION ADDED TO THE LIST OF CLIENTS...");
+            System.out.println("Lab1: Total number of clients: " + clients.size());
+            //*****************                      
           }
           catch(Exception e) {
             System.out.println("Exception caught while trying to write into the queue: " + HEATMAP_SUPPLIER_URL);

@@ -1,5 +1,5 @@
 
-// Denis test-map
+// Denis test-map AWS reactive consumer
 // server command line: java -jar build/libs/heatmap-1.0.0.jar <Lab: 1,2,both. Default: both> <Vehicles. Defaul: 10> <Vehicles real refresh interval in sec. Default: 60> 
 // example: java -jar build/libs/heatmap-1.0.0.jar both 10 2
 // client command line: localhost:8080
@@ -28,7 +28,6 @@ public class Application {
     private static final String DEFAULT_LOCATION_FILE = "./files/realtimelocation.csv";
     private static String[] args;
     private static String lab;
-    private static Lab1 lab1;
     
     public static void main(String[] args)
     {
@@ -43,40 +42,20 @@ public class Application {
 
           this.args = args;
           lab = ((args.length > 0) ? args[0] : DEFAULT_LAB);
-          try {
-            switch(lab) {
-              case "1":
-                System.out.println("Lab 1 selected");
-                lab1 = Lab1.getInstance();
-                break;
-              case "2":
-                System.out.println("Lab 2 selected");
-                break;
-              default:
-                lab = DEFAULT_LAB; 
-                System.out.println("Labs 1 and 2 selected");
-                lab1 = Lab1.getInstance();
-            }
-          }catch(Exception e) {
-            System.exit(1);
+          switch(lab) {
+            case "1":
+              System.out.println("Lab 1 selected");
+              break;
+            case "2":
+              System.out.println("Lab 2 selected");
+              break;
+            default:
+              lab = DEFAULT_LAB; 
+              System.out.println("Labs 1 and 2 selected");
           }
         };
     }
-    
-    // Register a shutdown hook with the JVM
-    @PreDestroy
-    public static void teardown()
-    {
-      System.out.println("TEAR DOWN!!!!!!");
-      if (lab.equals("1") || lab.equals("both")) {      
-        try {
-          lab1.unsubscribeSupplier();
-        }catch(Exception e) {
-          System.exit(1);
-        }
-      }
-    }
-    
+ 
     @Component
     public static class MyWebSocketConfigurer implements WebSocketConfigurer 
     {
@@ -98,7 +77,12 @@ public class Application {
           return; 
         }
         if (lab.equals("1") || lab.equals("both")) {
-          lab1.subscribeClient(session);
+          try {
+            Lab1.getInstance().subscribeClient(session);
+          } catch(Exception e) {
+            // Exception caught whilst trying to create Lab1 singleton class. Application must exit!
+            System.exit(1);
+          }
         }
         if (lab.equals("2") || lab.equals("both")) {
           new Lab2(session, args, DEFAULT_LOCATION_FILE);

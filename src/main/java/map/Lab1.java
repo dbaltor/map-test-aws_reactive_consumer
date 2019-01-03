@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.io.IOException;
 
-public class Lab1 {
+public class Lab1 { // Singleton
   
   private static final String SUPPLIER_TOPIC_ARN = "arn:aws:sns:eu-west-2:556385395922:heatmap";  
   private static final String DLQ_ARN = "arn:aws:sqs:eu-west-2:556385395922:heatmap-dlq";
@@ -44,17 +44,35 @@ public class Lab1 {
   // Collections of clients' subscriptions
   private final Map<String, Disposable> CLIENTS = new ConcurrentHashMap<>();
   
-  // Singleton
+  // private constructor
   private Lab1() {}
   
   private static Lab1 instance;
   
+  /**
+   * Instantiate singleton and create resources required
+   * 
+   * @throws Exception
+   */  
   public static Lab1 getInstance() throws Exception{
     if (instance == null){
       synchronized (Lab1.class) {
-        if(instance == null){
+        if (instance == null){
           instance = new Lab1();
+          // Subscribe Supplier's topic
           instance.subscribeSupplier();
+          // Register hook to clear up resources when exiting
+          Runtime.getRuntime().addShutdownHook(new Thread(){
+            public void run() { 
+              System.out.println("TEAR DOWN!!!!!!");
+              try {
+                instance.unsubscribeSupplier();
+              }catch(Exception e) {
+                System.out.println("Exception caught while trying unsubscribe Heatmap events producer...");
+                e.printStackTrace();
+              }              
+            } 
+          });           
         }
       }
     }
@@ -151,11 +169,11 @@ public class Lab1 {
     }
 
    /**
-    * Remove this application's queue and subscription to the Supplier
+    * Clear up this application's queue and subscription to the Supplier
     * 
     * @throws Exception
     */    
-    public void unsubscribeSupplier() throws Exception
+    private void unsubscribeSupplier() throws Exception
     {
       // Build the SNS client
       SnsClient snsClient = SnsClient.builder()

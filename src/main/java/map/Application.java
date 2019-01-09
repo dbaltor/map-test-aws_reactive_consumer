@@ -1,12 +1,11 @@
 
-// Denis test-map AWS reactive consumer
+// Denis test-map reactive AWS consumer
 // server command line: java -jar build/libs/heatmap-1.0.0.jar <Lab: 1,2,both. Default: both> <Vehicles. Defaul: 10> <Vehicles real refresh interval in sec. Default: 60> 
 // example: java -jar build/libs/heatmap-1.0.0.jar both 10 2
 // client command line: localhost:8080
 
 package map;
 
-import javax.annotation.PreDestroy;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,7 +24,6 @@ import org.springframework.web.socket.handler.BinaryWebSocketHandler;
 @SpringBootApplication
 public class Application {
   
-    private static final String DEFAULT_LOCATION_FILE = "./files/realtimelocation.csv";
     private static String[] args;
     private static String lab;
     
@@ -80,12 +78,15 @@ public class Application {
           try {
             Lab1.getInstance().subscribeClient(session);
           } catch(Exception e) {
-            // Exception caught whilst trying to create Lab1 singleton class. Application must exit!
-            System.exit(1);
+            e.printStackTrace();
           }
         }
         if (lab.equals("2") || lab.equals("both")) {
-          new Lab2(session, args, DEFAULT_LOCATION_FILE);
+          try {          
+            Lab2.getInstance(args).subscribeClient(session);
+          } catch(Exception e) {
+            e.printStackTrace();
+          }          
         }  
       }
     }

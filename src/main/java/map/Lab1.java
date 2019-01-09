@@ -210,7 +210,7 @@ public class Lab1 { // Singleton
         // Send start command to supplier
         QueueManager.put(HEATMAP_SUPPLIER_URL, "start");
         //***************** DEBUG
-        System.out.println("NEW CLIENT CONNECTED!!! " + session.getId());
+        System.out.println("LAB 1 - NEW CLIENT CONNECTED!!! " + session.getId());
         //*****************
         // subscribing for Heat Map events
         Disposable subscription = heatMapEvents

@@ -14,7 +14,9 @@ public class WsPacket {
     }
     try {
       session.sendMessage(new BinaryMessage(msg.getBytes())); 
-      //System.out.println("Sent: " + msg);
+      //***************** DEBUG
+      //System.out.println("Session: " + session.getId() + " -> Sent: " + msg);
+      //*****************      
     } catch (IOException e) {
       e.printStackTrace();
     }

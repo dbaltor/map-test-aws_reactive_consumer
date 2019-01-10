@@ -1,5 +1,5 @@
 # Denis map-test Reactive AWS Consumer 2018
-Massively scalable test map application developed with Spring Boot, Reactor and the newly released AWS Asynchronous SQS (Simple Queue Service) and SNS (Simple Notification Service) API.
+Massively scalable test map reactive application developed with Spring Boot, Reactor and the newly released AWS Asynchronous SQS (Simple Queue Service) and SNS (Simple Notification Service) API.
 <br>MAP_KEY environment variable must be set with the LocationIQ map token.
 <br>
 <br>

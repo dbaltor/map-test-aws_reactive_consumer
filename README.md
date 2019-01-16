@@ -26,11 +26,11 @@ localhost:8080
 
 *Cloud URL:
 ===========
-http://test-map-aws-r-consumer-route-map-test-sb.a3c1.starter-us-west-1.openshiftapps.com/
+http://ec2-35-167-140-176.us-west-2.compute.amazonaws.com/
 
 *Architectural Decisions:
 =========================
-1) Event-driven architecture (EDA) chosen rather than one-thread-per-connection model. I have opted for implementing this sample application using Reactor because all that must be done is handling data streams. For such I/O-bound scenarios, EDA are massive scalable whilst being lightweight.
+1) Event-driven non-blocking architecture (EDA) chosen rather than one-thread-per-connection model. I have opted for implementing this sample application using Reactor because all that must be done is handling data streams. For such I/O-bound scenarios, EDA are massive scalable whilst being lightweight.
 
 2) Push notifications using WebSockets. I believe only WebSockets (or Server-Sent Events) are viable options to meet the UI update rate required.
 

@@ -26,7 +26,7 @@ localhost:8080
 
 *Cloud URL:
 ===========
-http://ec2-35-167-140-176.us-west-2.compute.amazonaws.com/
+http://heatmap-ec2-1604000717.us-west-2.elb.amazonaws.com/
 
 *Architectural Decisions:
 =========================

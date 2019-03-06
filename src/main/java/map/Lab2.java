@@ -115,7 +115,6 @@ public class Lab2 { // Singleton
         //***************** DEBUG      
         //.log()
         //*****************
-        .subscribeOn(Schedulers.parallel())
         // keep the content in memory to be replayed later on 
         .replay(); 
       // Start reading the locations

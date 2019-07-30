@@ -1,3 +1,4 @@
+	//var socket = new WebSocket(location.origin.replace(/^http/, 'wss') + ':4443/lab'); // required to run on PWS
 	var socket = new WebSocket(location.origin.replace(/^http/, 'ws') + '/lab');
 	socket.binaryType = 'arraybuffer';
 	var log = console.log;

@@ -1,0 +1,8 @@
+---
+applications:
+- name: map-test-aws-reactive-consumer
+  path: build/libs/denis-map-test_aws_reactive_consumer-1.0.0.jar
+  env:
+    JBP_CONFIG_JAVA_MAIN: '{ arguments: "both 100 2 ./files/realtimelocation.csv" }'
+  buildpacks:
+  - https://github.com/cloudfoundry/java-buildpack.gi

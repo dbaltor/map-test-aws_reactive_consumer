@@ -26,7 +26,7 @@ localhost:8080
 
 *Cloud URL:
 ===========
-http://heatmap-ec2-1604000717.us-west-2.elb.amazonaws.com/
+http://map-test-aws-reactive-consumer.cfapps.io/
 
 *Architectural Decisions:
 =========================

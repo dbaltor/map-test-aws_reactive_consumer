@@ -5,4 +5,4 @@ applications:
   env:
     JBP_CONFIG_JAVA_MAIN: '{ arguments: "both 100 2 ./files/realtimelocation.csv" }'
   buildpacks:
-  - https://github.com/cloudfoundry/java-buildpack.gi
+  - https://github.com/cloudfoundry/java-buildpack.git

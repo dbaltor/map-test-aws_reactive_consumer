@@ -20,6 +20,9 @@ bootJar {
       include '*.csv'
       into 'files'
    }
+   from('files/') {
+      include 'init.sh'
+   }
 }
 
 buildscript {

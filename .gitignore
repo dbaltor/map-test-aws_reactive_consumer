@@ -1,10 +1,9 @@
-<<<<<<< HEAD
 # build artifacts
 .gradle
-build
+build/
+bin/
+.DS_Store
 
-=======
->>>>>>> 8b3c6ec9c239abcaff9db3a99861f92ff685d923
 # Compiled class file
 *.class
 
@@ -29,5 +28,6 @@ build
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# Script to run app locally
+# Scripts with secrets
 run.sh
+manifest.yml.java-cmd

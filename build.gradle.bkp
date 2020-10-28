@@ -1,0 +1,81 @@
+
+group = 'dbaltor'
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'com.palantir.docker'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+bootJar {
+    baseName = 'denis-map-test_aws_reactive_consumer'
+    version =  '1.0.0'
+    //launchScript {
+        //script = file('files/start.sh')
+        //properties 'RUN_ARGS': 'both 100 2 ./realtimelocation.csv'
+    //}    
+   from('files/') {
+      include '*.csv'
+      into 'files'
+   }
+}
+
+buildscript {
+    repositories {
+        mavenCentral()
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}	
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.4.RELEASE")
+		classpath('gradle.plugin.com.palantir.gradle.docker:gradle-docker:0.13.0')
+		classpath "io.spring.gradle:dependency-management-plugin:1.0.3.RELEASE"		
+    }
+}
+
+repositories {
+    mavenCentral()
+	maven { url 'http://repo.spring.io/milestone' }
+}
+
+dependencyManagement {
+  imports {
+	  mavenBom 'software.amazon.awssdk:bom:2.1.0'
+  }
+}
+
+dependencies {
+	compile 'software.amazon.awssdk:sns'
+	compile 'software.amazon.awssdk:sqs'
+	//compile group: 'software.amazon.awssdk', name: 'auth'
+	//compile group: 'software.amazon.awssdk', name: 'sdk-core'
+	//compile group: 'software.amazon.awssdk', name: 'aws-core'	
+
+	compile "io.projectreactor:reactor-core:3.2.3.RELEASE"
+	testCompile("io.projectreactor:reactor-test:3.2.3.RELEASE")	
+
+	// compile("org.springframework.boot:spring-boot-devtools")
+    compile("org.springframework.boot:spring-boot-starter-web")
+	compile("org.springframework.boot:spring-boot-starter-websocket")	
+    compile("org.springframework.boot:spring-boot-starter-actuator")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+
+	testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+bootRun {
+    if (project.hasProperty('args')) {
+        args project.args.split(',')
+    }
+}
+
+docker {
+    dependsOn build
+    name "${project.group}/${bootJar.baseName}:${bootJar.version}"
+    files bootJar.archivePath
+        copySpec.from("files").into(".")
+        buildArgs(['JAR_FILE': "${bootJar.archiveName}"])
+}

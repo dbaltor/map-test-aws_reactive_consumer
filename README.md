@@ -26,7 +26,7 @@ localhost:8080
 
 *Cloud URL:
 ===========
-http://map-test-aws-reactive-consumer.cfapps.io/
+https://map-test-aws-reactive-consumer.apps.pcfone.io/
 
 *Architectural Decisions:
 =========================
